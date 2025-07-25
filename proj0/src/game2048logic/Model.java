@@ -84,7 +84,15 @@ public class Model {
      *  Empty spaces are stored as null.
      * */
     public boolean emptySpaceExists() {
-        // TODO: Task 2. Fill in this function.
+        int boardSize = size();
+
+        for(int x=0;x<boardSize;x++) {
+            for(int y=0;y<boardSize;y++) {
+                if (board.tile(x, y) == null) {
+                    return true; 
+                }
+            }
+        }
         return false;
     }
 
@@ -94,7 +102,16 @@ public class Model {
      * given a Tile object t, we get its value with t.value().
      */
     public boolean maxTileExists() {
-        // TODO: Task 3. Fill in this function.
+        int boardSize = size();
+
+        for (int x = 0; x < boardSize; x++) {
+            for (int y = 0; y < boardSize; y++) {
+                Tile t = board.tile(x, y);
+                if (t != null && t.value() == MAX_PIECE) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -105,7 +122,32 @@ public class Model {
      * 2. There are two adjacent tiles with the same value.
      */
     public boolean atLeastOneMoveExists() {
-        // TODO: Fill in this function.
+        if (emptySpaceExists()) {
+            return true;
+        }
+
+        int boardSize = size();
+        int[] dx = {1, 0, -1, 0}; // right, up, left, down
+        int[] dy = {0, 1, 0, -1}; // right, up, left, down
+
+        for (int x = 0; x < boardSize; x++) {
+            for (int y = 0; y < boardSize; y++) {
+                Tile currentTile = board.tile(x, y);
+                if (currentTile == null) {
+                    continue; // Skip empty spaces
+                }
+                for (int d = 0; d < 4; d++) {
+                    int nx = x + dx[d];
+                    int ny = y + dy[d];
+                    if (nx >= 0 && nx < boardSize && ny >= 0 && ny < boardSize) {
+                        Tile neighborTile = board.tile(nx, ny);
+                        if (neighborTile != null && neighborTile.value() == currentTile.value()) {
+                            return true; // Found adjacent tiles with the same value
+                        }
+                    }
+                }
+            }
+        }
         return false;
     }
 
@@ -125,10 +167,32 @@ public class Model {
      */
     public void moveTileUpAsFarAsPossible(int x, int y) {
         Tile currTile = board.tile(x, y);
+        if (currTile == null) {
+            return; // No tile to move
+        }
         int myValue = currTile.value();
         int targetY = y;
 
-        // TODO: Tasks 5, 6, and 10. Fill in this function.
+        int boardSize = size();
+        Tile mergeTargetTile = null;
+
+        for (int i = y+1;i<board.size();i++){
+            Tile tileAbove = board.tile(x,i);
+            if (tileAbove == null) {
+                targetY = i; // Move up to the next empty space
+            } else if (tileAbove.value() == myValue && !tileAbove.wasMerged())
+            {
+                mergeTargetTile = tileAbove;
+                targetY = i; // Merge with the tile above
+                break;
+            }
+            else{
+                targetY = i-1;
+                break;
+            }
+        }
+
+        
     }
 
     /** Handles the movements of the tilt in column x of the board
